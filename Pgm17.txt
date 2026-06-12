@@ -1,0 +1,248 @@
+
+-----------------------------------------------------------
+PROGRAM 17 - Nginx Docker Image + Kubernetes MongoDB Deployment
+------------------------------------------------------------
+
+Q4: Docker commands to run nginx image
+----------------------------------------
+docker pull nginx
+docker run -d -p 8080:80 --name my-nginx nginx
+
+# Check running container
+docker ps
+
+# Execute commands inside container
+docker exec -it my-nginx /bin/bash
+ls /usr/share/nginx/html
+exit
+
+# Stop and remove
+docker stop my-nginx
+docker rm my-nginx
+
+Q5: Kubernetes - Create MongoDB deployment and run kubectl commands
+-------------------------------------------------------------------
+# Create deployment
+kubectl create deployment mongo-deploy --image=mongo
+
+# Check deployment
+kubectl get deployments
+
+# Check pods
+kubectl get pods
+
+# Describe a pod
+kubectl describe pod <pod-name>
+
+# Delete deployment
+kubectl delete deployment mongo-deploy
+
+------------------------------------------------------------
+PROGRAM 18 - HTML Registration Form: Docker + DockerHub + GitHub
+------------------------------------------------------------
+
+Step 1: Create HTML Registration Form (index.html)
+----------------------------------------------------
+<!DOCTYPE html>
+<html>
+<head><title>Registration</title></head>
+<body>
+  <h2>Registration Form</h2>
+  <form>
+    Name: <input type="text"><br><br>
+    Email: <input type="email"><br><br>
+    Phone: <input type="tel"><br><br>
+    <input type="submit" value="Register">
+  </form>
+</body>
+</html>
+
+Step 2: Create Dockerfile
+--------------------------
+FROM nginx:alpine
+COPY index.html /usr/share/nginx/html/index.html
+
+Step 3: Build and run
+----------------------
+docker build -t html-reg-app .
+docker run -p 8080:80 html-reg-app
+
+Step 4: Push code to GitHub
+-----------------------------
+git init
+git add .
+git commit -m "HTML Registration App"
+git remote add origin https://github.com/yourusername/html-reg.git
+git push origin main
+
+Step 5: Push image to DockerHub
+---------------------------------
+docker login
+docker tag html-reg-app yourusername/html-reg-app
+docker push yourusername/html-reg-app
+
+------------------------------------------------------------
+PROGRAM 19 - Docker Compose: Two BusyBox containers (ping test)
+------------------------------------------------------------
+
+Step 1: Create docker-compose.yml
+-----------------------------------
+version: '3'
+services:
+  bbConA:
+    image: busybox
+    container_name: bbConA
+    command: sh -c "ping -c 4 bbConB"
+    depends_on:
+      - bbConB
+    networks:
+      - mynet
+
+  bbConB:
+    image: busybox
+    container_name: bbConB
+    command: sh -c "sleep 30"
+    networks:
+      - mynet
+
+networks:
+  mynet:
+    driver: bridge
+
+Step 2: Run the Docker Compose file
+-------------------------------------
+docker-compose up
+
+(You will see bbConA pinging bbConB successfully in the output)
+
+Step 3: Stop and remove
+------------------------
+docker-compose down
+
+------------------------------------------------------------
+PROGRAM 20 - Kubernetes: nginx Deployment using YAML
+------------------------------------------------------------
+
+Step 1: Create deployment YAML file (nginx-deployment.yaml)
+-------------------------------------------------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+
+Step 2: Apply the YAML file
+-----------------------------
+kubectl apply -f nginx-deployment.yaml
+
+Step 3: Check the deployment
+------------------------------
+kubectl get deployments
+kubectl get pods
+
+Step 4: Delete deployment
+--------------------------
+kubectl delete -f nginx-deployment.yaml
+
+------------------------------------------------------------
+PROGRAM 21 - Kubernetes Node Deployment + Selenium (Open Website)
+------------------------------------------------------------
+
+Q4: Kubernetes - Create Node deployment and run kubectl commands
+----------------------------------------------------------------
+kubectl create deployment node-deploy --image=node:18
+kubectl get deployments
+kubectl get pods
+kubectl describe deployment node-deploy
+kubectl delete deployment node-deploy
+
+Q5: JavaScript program to open Google using Selenium
+------------------------------------------------------
+
+Step 1: Install Selenium and ChromeDriver
+------------------------------------------
+npm install selenium-webdriver
+
+Step 2: Write the JavaScript program (openGoogle.js)
+------------------------------------------------------
+const { Builder } = require('selenium-webdriver');
+
+async function openGoogle() {
+    let driver = await new Builder().forBrowser('chrome').build();
+    await driver.get('https://www.google.com');
+    console.log("Google opened successfully!");
+    await driver.quit();
+}
+
+openGoogle();
+
+Step 3: Run the program
+------------------------
+node openGoogle.js
+
+----------------------------------------------------------
+PROGRAM 22 - Selenium: Login Validation
+------------------------------------------------------------
+
+Step 1: Write a simple HTML login page (login.html)
+-----------------------------------------------------
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username"><br><br>
+  <input type="password" id="password" placeholder="Password"><br><br>
+  <button onclick="validate()">Login</button>
+  <p id="msg"></p>
+  <script>
+    function validate() {
+      var u = document.getElementById("username").value;
+      var p = document.getElementById("password").value;
+      if (u === "admin" && p === "1234") {
+        document.getElementById("msg").innerText = "Login Successful!";
+      } else {
+        document.getElementById("msg").innerText = "Invalid Credentials!";
+      }
+    }
+  </script>
+</body>
+</html>
+
+Step 2: Selenium test (loginTest.js)
+--------------------------------------
+const { Builder, By } = require('selenium-webdriver');
+const path = require('path');
+
+async function testLogin() {
+    let driver = await new Builder().forBrowser('chrome').build();
+    await driver.get('file://' + path.resolve('login.html'));
+
+    await driver.findElement(By.id('username')).sendKeys('admin');
+    await driver.findElement(By.id('password')).sendKeys('1234');
+    await driver.findElement(By.css('button')).click();
+
+    let msg = await driver.findElement(By.id('msg')).getText();
+    console.log("Result:", msg);
+
+    await driver.quit();
+}
+
+testLogin();
+
+Step 3: Run
+------------
+node loginTest.js
