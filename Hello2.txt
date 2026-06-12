@@ -1,0 +1,189 @@
+
+  ------------------------------------------------------------
+PROGRAM 23 - Selenium: Check Exam Results on College Website
+------------------------------------------------------------
+
+Step 1: Selenium program (checkResult.js)
+-------------------------------------------
+const { Builder, By, until } = require('selenium-webdriver');
+
+async function checkResult() {
+    let driver = await new Builder().forBrowser('chrome').build();
+    await driver.get('https://matrusri.skolo.in/');
+
+    console.log("Opened College Website");
+
+    // Wait for page to load
+    await driver.wait(until.titleContains(''), 5000);
+
+    let title = await driver.getTitle();
+    console.log("Page Title:", title);
+
+    await driver.quit();
+}
+
+checkResult();
+
+Step 2: Run
+------------
+node checkResult.js
+
+------------------------------------------------------------
+PROGRAM 24 - Selenium: Calculator Web App with Test Cases
+------------------------------------------------------------
+
+Step 1: Create Calculator HTML (calculator.html)
+--------------------------------------------------
+<!DOCTYPE html>
+<html>
+<body>
+  <h2>Calculator</h2>
+  <input type="number" id="a" placeholder="Number 1">
+  <input type="number" id="b" placeholder="Number 2">
+  <button onclick="calc('add')">Add</button>
+  <button onclick="calc('sub')">Sub</button>
+  <p id="result"></p>
+  <script>
+    function calc(op) {
+      var a = parseFloat(document.getElementById('a').value);
+      var b = parseFloat(document.getElementById('b').value);
+      var res;
+      if (op === 'add') res = a + b;
+      else if (op === 'sub') res = a - b;
+      document.getElementById('result').innerText = "Result: " + res;
+    }
+  </script>
+</body>
+</html>
+
+Step 2: Selenium Test (calcTest.js)
+-------------------------------------
+const { Builder, By } = require('selenium-webdriver');
+const path = require('path');
+
+async function testCalc() {
+    let driver = await new Builder().forBrowser('chrome').build();
+    await driver.get('file://' + path.resolve('calculator.html'));
+
+    await driver.findElement(By.id('a')).sendKeys('10');
+    await driver.findElement(By.id('b')).sendKeys('5');
+    await driver.findElement(By.css('button')).click();
+
+    let result = await driver.findElement(By.id('result')).getText();
+    console.log("Test Result:", result);
+
+    await driver.quit();
+}
+
+testCalc();
+
+Step 3: Run
+------------
+node calcTest.js
+
+------------------------------------------------------------
+PROGRAM 25 - Jenkins: Java Program in GitHub + Remote Trigger
+------------------------------------------------------------
+
+Step 1: Write a Java program (Hello.java) and push to GitHub
+(Same as Program 1 - see above)
+
+Step 2: Create Jenkins Job
+---------------------------
+1. New Item -> Freestyle Project -> OK
+2. Source Code Management -> Git -> Enter repo URL
+3. Under "Build Triggers" -> Check "Trigger builds remotely"
+4. Enter a token name, e.g.: mytoken
+5. Build -> Execute shell:
+   javac Hello.java
+   java Hello
+6. Save
+
+Step 3: Trigger the build remotely
+------------------------------------
+Open browser and go to:
+http://localhost:8080/job/JobName/build?token=mytoken
+
+This will trigger the build remotely without logging into Jenkins.
+
+------------------------------------------------------------
+PROGRAM 26 - Jenkins: Python Calculator + SCM Polling Trigger
+------------------------------------------------------------
+
+Step 1: Write Python Calculator (calc.py)
+------------------------------------------
+a = 10
+b = 5
+print("ADD:", a + b)
+print("SUB:", a - b)
+print("MUL:", a * b)
+print("DIV:", a / b)
+
+Step 2: Push to GitHub
+-----------------------
+git init
+git add calc.py
+git commit -m "Python Calculator"
+git remote add origin https://github.com/yourusername/py-calc.git
+git push origin main
+
+Step 3: Create Jenkins Job with SCM Polling
+--------------------------------------------
+1. New Item -> Freestyle Project -> OK
+2. Source Code Management -> Git -> Enter repo URL
+3. Under "Build Triggers" -> Check "Poll SCM"
+4. Enter schedule: H/5 * * * *
+   (Checks GitHub every 5 minutes for new changes)
+5. Build -> Execute shell:
+   python3 calc.py
+6. Save
+
+Now whenever you push a new change to GitHub, Jenkins will
+automatically detect it and trigger a new build!
+
+------------------------------------------------------------
+PROGRAM 27 - Jenkins: Java & Python Calculator + File and Variable Parameterization
+------------------------------------------------------------
+
+Step 1: Java Calculator (Calculator.java)
+------------------------------------------
+public class Calculator {
+    public static void main(String[] args) {
+        int a = 10, b = 5;
+        System.out.println("ADD: " + (a + b));
+        System.out.println("SUB: " + (a - b));
+        System.out.println("MUL: " + (a * b));
+        System.out.println("DIV: " + (a / b));
+    }
+}
+
+Step 2: Python Calculator (calc.py)
+-------------------------------------
+a = 10
+b = 5
+print("ADD:", a + b)
+print("SUB:", a - b)
+print("MUL:", a * b)
+print("DIV:", a / b)
+
+Step 3: Jenkins Job with File + Variable Parameterization
+----------------------------------------------------------
+1. New Item -> Freestyle Project -> OK
+2. Check "This project is parameterized"
+3. Add Parameter -> "String Parameter"
+   - Name: LANG
+   - Default Value: python
+   - Description: Enter 'java' or 'python'
+4. Add Parameter -> "File Parameter"
+   - File location: uploaded_script
+5. Build -> Execute shell:
+   if [ "$LANG" = "python" ]; then
+       python3 calc.py
+   else
+       javac Calculator.java
+       java Calculator
+   fi
+6. Save -> Build with Parameters
+   - Enter LANG = python or java
+   - Upload the corresponding script file
+   - Click Build
