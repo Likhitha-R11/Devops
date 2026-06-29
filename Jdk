@@ -1,0 +1,27 @@
+Docker – Force Installation Commands
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+sudo sh
+sudo systemctl enable --now docker
+docker --version
+
+Kubernetes – Force Installation Commands
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl
+sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+sudo apt install -y kubelet kubeadm kubectl
+kubectl version --client
+
+Selenium – Force Installation Commands
+sudo apt update
+sudo apt install -y python3 python3-pip
+pip3 install selenium
+pip3 install webdriver-manager
+python3 -c "import selenium; print(selenium.__version__)"
+
+Jenkins – Force \Installation Commands
+sudo apt update
+sudo apt install -y openjdk-21-jdk
+sudo tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+sudo apt install -y jenkins
+sudo systemctl enable --now jenkins
